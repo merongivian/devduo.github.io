@@ -343,6 +343,28 @@
             font-size: 4rem;
         }
 
+        .member-image.washington {
+            background-image: url('wacho.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .member-image.washington::before {
+            display: none;
+        }
+
+        .member-image.jose {
+            background-image: url('jose.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .member-image.jose::before {
+            display: none;
+        }
+
         .member-name {
             font-family: 'Space Grotesk', sans-serif;
             font-size: 1.5rem;
@@ -663,14 +685,14 @@
         <h2 class="section-title fade-in">Our Team</h2>
         <div class="team-grid">
             <div class="team-member fade-in">
-                <div class="member-image"></div>
+                <div class="member-image jose"></div>
                 <h3 class="member-name">Jose Añasco</h3>
-                <p class="member-role">Senior Full-Stack Developer & Software Architect</p>
-                <p>10+ years of experience leading development teams and architecting software solutions. Expertise in Ruby, JavaScript/React, automated testing, and agile methodologies. Has contributed to various startups and government projects across Norway, Ecuador, and Dominican Republic.</p>
+                <p class="member-role">Full-Stack Developer</p>
+                <p>8+ years of experience leading development teams and architecting software solutions. Expertise in Ruby, JavaScript/React, automated testing, and agile methodologies. Has contributed to various startups and government projects across Norway, Ecuador, and Dominican Republic.</p>
                 
                 <div style="text-align: left; margin-top: 1rem; font-size: 0.9rem; color: #ccc;">
                     <strong>Key Experience:</strong><br>
-                    • Software Architect at Fast Travel (Airport taxi queue system)<br>
+                    • Fullstack Developer at Fast Travel (Airport taxi queue system)<br>
                     • Senior Developer at Rubynor (Multiple startup projects)<br>
                     • Municipal invite system implementation at Kaukus<br>
                     • Real-time gaming API at Blue Lizard Games<br>
@@ -691,7 +713,7 @@
                 </div>
             </div>
             <div class="team-member fade-in">
-                <div class="member-image" style="--emoji: '🤖'"></div>
+                <div class="member-image washington"></div>
                 <h3 class="member-name">Washington Añasco</h3>
                 <p class="member-role">AI/ML Engineer & Data Scientist</p>
                 <p>Master's degree in Machine Learning and Data Mining with specialized expertise in AI model development, large language models, and cloud architecture. Expert in Python, JavaScript, React, and building custom GPT-based chatbots with domain adaptation and prompt engineering.</p>
