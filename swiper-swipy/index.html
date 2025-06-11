@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swiper Swipy - Chrome Extension for Dating Apps</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-orange: #FFA903;
+            --primary-pink: #FD4E69;
+            --black: #000000;
+            --white: #ffffff;
+            --dark-gray: #1a1a1a;
+            --light-gray: #f5f5f5;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--black) 0%, var(--dark-gray) 100%);
+            color: var(--white);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(-45deg, var(--black), var(--dark-gray), var(--primary-pink), var(--primary-orange));
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating Hearts */
+        .floating-heart {
+            position: absolute;
+            color: var(--primary-pink);
+            font-size: 2rem;
+            opacity: 0.3;
+            animation: floatHeart 8s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        .heart-1 {
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .heart-2 {
+            top: 60%;
+            right: 15%;
+            animation-delay: 3s;
+        }
+
+        .heart-3 {
+            bottom: 30%;
+            left: 60%;
+            animation-delay: 6s;
+        }
+
+        @keyframes floatHeart {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
+            50% { transform: translateY(-30px) rotate(15deg); opacity: 0.7; }
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 169, 3, 0.3);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--primary-orange), var(--primary-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(45deg, var(--primary-orange), var(--primary-pink));
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0 2rem;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            z-index: 10;
+        }
+
+        .chrome-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            padding: 0.5rem 1rem;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+            color: var(--primary-orange);
+        }
+
+        .hero h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--white) 0%, var(--primary-orange) 50%, var(--primary-pink) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            color: var(--light-gray);
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2.5rem;
+            background: linear-gradient(45deg, var(--primary-orange), var(--primary-pink));
+            color: var(--white);
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(255, 169, 3, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(255, 169, 3, 0.6);
+        }
+
+        /* Features Section */
+        .features {
+            padding: 5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 3rem;
+            background: linear-gradient(45deg, var(--primary-orange), var(--primary-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(45deg, var(--primary-orange), var(--primary-pink));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, var(--primary-orange), var(--primary-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Supported Apps Section */
+        .supported-apps {
+            padding: 5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .app-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .app-card:hover {
+            transform: translateY(-5px);
+            background: linear-gradient(45deg, rgba(255, 169, 3, 0.1), rgba(253, 78, 105, 0.1));
+        }
+
+        .app-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* How It Works Section */
+        .how-it-works {
+            padding: 5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .steps-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .step {
+            text-align: center;
+            position: relative;
+        }
+
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, var(--primary-orange), var(--primary-pink));
+            border-radius: 50%;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        /* Download Section */
+        .download {
+            padding: 5rem 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(255, 169, 3, 0.1), rgba(253, 78, 105, 0.1));
+        }
+
+        .download-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 169, 3, 0.3);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .features-grid,
+            .apps-grid,
+            .steps-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Warning Box */
+        .warning-box {
+            background: rgba(253, 78, 105, 0.1);
+            border: 1px solid var(--primary-pink);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 3rem auto;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .warning-box h4 {
+            color: var(--primary-pink);
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animation"></div>
+    
+    <!-- Floating Hearts -->
+    <div class="floating-heart heart-1">💖</div>
+    <div class="floating-heart heart-2">💕</div>
+    <div class="floating-heart heart-3">💘</div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">Swiper Swipy</div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#apps">Supported Apps</a></li>
+                <li><a href="#download">Download</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <div class="chrome-badge">
+                🔥 Chrome Extension
+            </div>
+            <h1>Swiper Swipy</h1>
+            <p class="subtitle">Enhanced dating app experience for Tinder, Bumble, Badoo & OkCupid. Spend more time connecting, less time swiping.</p>
+            <a href="https://chromewebstore.google.com/detail/swiper-swipy/keloicphphomioeamjgpjlheilchhmcd" class="cta-button" target="_blank" rel="noopener noreferrer">
+                <span>Add to Chrome</span>
+                <span>🚀</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <h2 class="section-title fade-in">Powerful Features</h2>
+        <div class="features-grid">
+            <div class="feature-card fade-in">
+                <div class="feature-icon">∞</div>
+                <h3>Unlimited Swipes</h3>
+                <p>Break free from daily swipe limits and explore unlimited profiles on your favorite dating platforms.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon">🎯</div>
+                <h3>Age Range Control</h3>
+                <p>Define your preferred age range and automatically filter profiles to match your dating preferences.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon">📍</div>
+                <h3>Distance Settings</h3>
+                <p>Set minimum distance preferences to find matches that work with your lifestyle and location.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon">⚡</div>
+                <h3>Smart Filtering</h3>
+                <p>Loosen your dating app filters and let Swiper Swipy intelligently adjust based on your preferences.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon">📈</div>
+                <h3>Boost Your Profile</h3>
+                <p>Increase your reputation on dating sites by maintaining an active swiping pattern with smart automation.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon">🎮</div>
+                <h3>Easy to Use</h3>
+                <p>Simple, intuitive interface that enhances your dating experience without getting in the way.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Supported Apps Section -->
+    <section id="apps" class="supported-apps">
+        <h2 class="section-title fade-in">Supported Dating Apps</h2>
+        <p class="fade-in">Swiper Swipy works seamlessly with the most popular dating platforms</p>
+        <div class="apps-grid">
+            <div class="app-card fade-in">
+                <div class="app-icon">🔥</div>
+                <h3>Tinder</h3>
+            </div>
+            <div class="app-card fade-in">
+                <div class="app-icon">🐝</div>
+                <h3>Bumble</h3>
+            </div>
+            <div class="app-card fade-in">
+                <div class="app-icon">💜</div>
+                <h3>Badoo</h3>
+            </div>
+            <div class="app-card fade-in">
+                <div class="app-icon">💙</div>
+                <h3>OkCupid</h3>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="how-it-works">
+        <h2 class="section-title fade-in">How It Works</h2>
+        <div class="steps-container">
+            <div class="step fade-in">
+                <div class="step-number">1</div>
+                <h3>Install Extension</h3>
+                <p>Add Swiper Swipy to your Chrome browser with one click</p>
+            </div>
+            <div class="step fade-in">
+                <div class="step-number">2</div>
+                <h3>Configure Settings</h3>
+                <p>Set your age range, distance preferences, and filtering options</p>
+            </div>
+            <div class="step fade-in">
+                <div class="step-number">3</div>
+                <h3>Start Swiping</h3>
+                <p>Let Swiper Swipy enhance your dating app experience automatically</p>
+            </div>
+            <div class="step fade-in">
+                <div class="step-number">4</div>
+                <h3>Find Matches</h3>
+                <p>Spend more time connecting with people you're genuinely interested in</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Warning Box -->
+    <div class="warning-box fade-in">
+        <h4>⚠️ Important Notice</h4>
+        <p>Due to frequent updates on dating platforms like Tinder, Bumble, Badoo, and OkCupid, the extension may occasionally experience compatibility issues. Please report any problems so we can provide updates promptly.</p>
+    </div>
+
+    <!-- Download Section -->
+    <section id="download" class="download">
+        <div class="download-content fade-in">
+            <h2 class="section-title">Ready to Transform Your Dating Experience?</h2>
+            <p style="margin-bottom: 2rem;">Join thousands of users who are already using Swiper Swipy to enhance their dating app experience.</p>
+            <a href="https://chromewebstore.google.com/detail/swiper-swipy/keloicphphomioeamjgpjlheilchhmcd" class="cta-button" style="font-size: 1.2rem; padding: 1.2rem 3rem;" target="_blank" rel="noopener noreferrer">
+                <span>Add to Chrome - It's Free!</span>
+                <span>💖</span>
+            </a>
+            <p style="margin-top: 1rem; font-size: 0.9rem; opacity: 0.7;">Compatible with Chrome • Easy setup • No registration required</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 Swiper Swipy. Enhancing your dating app experience.</p>
+        <p style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.7;">Made with ❤️ for better connections</p>
+    </footer>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Intersection Observer for fade-in animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all fade-in elements
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Parallax effect for floating hearts
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const parallax = scrolled * 0.3;
+            
+            document.querySelectorAll('.floating-heart').forEach((heart, index) => {
+                const speed = (index + 1) * 0.2;
+                heart.style.transform = `translateY(${parallax * speed}px) rotate(${parallax * 0.1}deg)`;
+            });
+        });
+
+        // Add some interactive heart effects on click
+        document.addEventListener('click', (e) => {
+            const heart = document.createElement('div');
+            heart.innerHTML = '💖';
+            heart.style.cssText = `
+                position: fixed;
+                left: ${e.clientX - 10}px;
+                top: ${e.clientY - 10}px;
+                color: #FD4E69;
+                font-size: 1.5rem;
+                pointer-events: none;
+                z-index: 1000;
+                animation: heartPop 1s ease-out forwards;
+            `;
+            
+            document.body.appendChild(heart);
+            
+            setTimeout(() => {
+                heart.remove();
+            }, 1000);
+        });
+
+        // Add CSS for heart pop animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes heartPop {
+                0% {
+                    transform: scale(0) rotate(0deg);
+                    opacity: 1;
+                }
+                50% {
+                    transform: scale(1.2) rotate(15deg);
+                    opacity: 0.8;
+                }
+                100% {
+                    transform: scale(0) rotate(30deg);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html> 
